@@ -2,7 +2,7 @@
 
 This project is an Expense Tracker application built using HTML, CSS, JavaScript, and Django. It helps users to easily track their daily expenses and manage their finances efficiently.
 
-Features:
+#Features:
 
 
 User authentication (sign up, login, and logout)
@@ -18,7 +18,7 @@ Search expenses by category or date
 Responsive design for mobile and desktop
 
 
-Technologies:
+#Technologies:
 
 
 Frontend: HTML, CSS, JavaScript
@@ -27,7 +27,7 @@ Backend: Django (Python)
 
 Database: SQLite (default Django database)
 
-How to Run:
+#How to Run:
 
 
 Set up a virtual environment and install the dependencies:
