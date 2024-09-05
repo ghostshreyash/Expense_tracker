@@ -1,0 +1,39 @@
+<!-- tracker/templates/tracker/monthly_budget.html -->
+
+{% extends 'tracker/base.html' %}
+
+{% block title %}Monthly Budget - Your Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Monthly Budget</h2>
+
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <!-- Monthly Budget Box -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Monthly Budget</h5>
+                    {% if monthly_budget %}
+                        <p class="card-text">₹{{ monthly_budget.amount }}</p>
+                        <!-- Clear Monthly Budget Button -->
+                        <form method="post" action="{% url 'clear_monthly_budget' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">Clear Monthly Budget</button>
+                        </form>
+                    {% else %}
+                        <p class="card-text">Monthly Budget Not Set</p>
+                    {% endif %}
+                    
+                    <!-- Add Monthly Budget Form -->
+                    <form method="post" action="">
+                        {% csrf_token %}
+                        {{ monthly_budget_form.amount }}
+                        <button type="submit" class="btn btn-primary">Set Monthly Budget</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

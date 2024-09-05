@@ -1,0 +1,8 @@
+<!-- tracker/templates/tracker/recent_expenses.html -->
+<div class="mt-4">
+    <h3>Recent Expenses</h3>
+    <!-- Display the list of recent expenses here -->
+    {% for expense in expenses %}
+        <p>{{ expense.description }} - {{ expense.amount }}</p>
+    {% endfor %}
+</div>

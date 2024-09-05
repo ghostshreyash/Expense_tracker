@@ -1,0 +1,191 @@
+<!-- tracker/templates/tracker/home.html -->
+{% extends 'tracker/base.html' %}
+
+{% block title %}Home - Your Expense Tracker{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Welcome to Your Expense Tracker, {{ user.username }}!</h2>
+
+    <div class="mt-4">
+        <a href="#" class="btn btn-primary" data-toggle="modal" data-target="#addExpenseModal">Add Expense</a>
+        {% if show_add_monthly_budget_button %}
+        <a href="#" class="btn btn-success" data-toggle="modal" data-target="#addMonthlyBudgetModal">Add Monthly Budget</a>
+    {% endif %}
+    </div>
+    {% if expenses %}
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <!-- Total Expenses Box -->
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Total Expenses</h5>
+                    <p class="card-text">₹{{ total_expenses }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <!-- Monthly Budget Box -->
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">Monthly Budget</h5>
+            <div class="d-flex justify-content-between align-items-center">
+                {% if is_monthly_budget_set %}
+                    <p class="card-text mb-0">₹{{ monthly_budget.amount }}</p>
+                    <!-- Edit Monthly Budget Option -->
+                    <a href="#" data-toggle="modal" data-target="#editMonthlyBudgetModal">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-pencil-square" viewBox="0 0 16 16">
+                            <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+                            <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5z"/>
+                        </svg>
+                    </a>
+                    <!-- Clear Monthly Budget Option -->
+                    <a href="{% url 'clear_monthly_budget' %}" class="btn btn-danger ml-2">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-x-circle-fill" viewBox="0 0 16 16">
+                            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0M5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293z"/>
+                        </svg>
+                    </a>
+                {% else %}
+                    <p class="card-text mb-0">Monthly Budget Not Set</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+        </div>
+    </div>
+
+    <h3>Your Recent Expenses</h3>
+    <table class="table">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Description</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Category</th>
+                <th scope="col">Source</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.description }}</td>
+                    <td>₹{{ expense.amount }}</td>
+                    <td>{{ expense.get_category_display }}</td>
+                    <td>{{ expense.source }}</td>
+                    <td>
+                        <a href="{% url 'edit_expense' expense.id %}" class="btn btn-warning btn-sm" role="button">
+                            <i class="fa fa-pencil" title="Edit"></i> Edit
+                        </a>
+                        <a href="{% url 'delete_expense' expense.id %}" class="btn btn-danger btn-sm" role="button">
+                            <i class="bi bi-trash" title="Delete"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+        
+    {% else %}
+        <p>No expenses recorded yet.</p>
+    {% endif %}
+</div>
+
+<!-- Add Expense Modal -->
+<div class="modal fade" id="addExpenseModal" tabindex="-1" role="dialog" aria-labelledby="addExpenseModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addExpenseModalLabel">Add Expense</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Include the Add Expense form here -->
+                <form method="post" action="{% url 'add_expense' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_amount">Amount</label>
+                        {{ expense_form.amount }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_description">Description</label>
+                        {{ expense_form.description }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_date">Date</label>
+                        {{ expense_form.date }}
+                    </div>
+                    <!-- Add the category and source fields here -->
+                    <div class="form-group">
+                        <label for="id_category">Category</label>
+                        {{ expense_form.category }}
+                    </div>
+                    <div class="form-group">
+                        <label for="id_source">Source</label>
+                        {{ expense_form.source }}
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Expense</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Monthly Budget Modal -->
+<div class="modal fade" id="addMonthlyBudgetModal" tabindex="-1" role="dialog" aria-labelledby="addMonthlyBudgetModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="addMonthlyBudgetModalLabel">Add Monthly Budget</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Monthly Budget Form -->
+                <form method="post" action="{% url 'add_monthly_budget' %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_amount">Amount</label>
+                        <input type="number" name="amount" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Monthly Budget</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Monthly Budget Modal -->
+<div class="modal fade" id="editMonthlyBudgetModal" tabindex="-1" role="dialog" aria-labelledby="editMonthlyBudgetModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="editMonthlyBudgetModalLabel">Edit Monthly Budget</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <!-- Monthly Budget Form for Editing -->
+                <form method="post" action="{% url 'edit_monthly_budget' monthly_budget.id %}">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="id_amount">Amount</label>
+                        <input type="number" name="amount" value="{{ monthly_budget.amount }}" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Save Monthly Budget</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+<!-- Bootstrap JS, Popper.js, and jQuery -->
+<script src="https://code.jquery.com/jquery-3.6.4.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>

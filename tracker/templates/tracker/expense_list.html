@@ -1,0 +1,62 @@
+<!-- tracker/templates/tracker/expense_list.html -->
+{% extends 'tracker/base.html' %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Expense List</h2>
+
+    <!-- Date range filter form -->
+    <div class="mb-3">
+        <form method="get" class="form-inline">
+            <label for="start_date" class="mr-2">Start Date:</label>
+            <input type="date" name="start_date" id="start_date" class="form-control mr-2" value="{{ start_date }}">
+
+            <label for="end_date" class="mr-2">End Date:</label>
+            <input type="date" name="end_date" id="end_date" class="form-control mr-2" value="{{ end_date }}">
+
+            <button type="submit" class="btn btn-primary">Apply</button>
+
+            {% if start_date or end_date %}
+                <a href="{% url 'expense_list' %}" class="btn btn-secondary ml-3">Clear</a>
+            {% endif %}
+        </form>
+    </div>
+
+    <!-- Display total expense for the selected date range -->
+    {% if total_expense %}
+        <p class="font-weight-bold">Total Expense for the selected period: ₹{{ total_expense }}</p>
+    {% endif %}
+
+    <table class="table mt-4">
+        <thead>
+            <tr>
+                <th scope="col">Date</th>
+                <th scope="col">Description</th>
+                <th scope="col">Amount</th>
+                <th scope="col">Category</th>
+                <th scope="col">Source</th>
+                <th scope="col">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expense in expenses %}
+                <tr>
+                    <td>{{ expense.date }}</td>
+                    <td>{{ expense.description }}</td>
+                    <td>₹{{ expense.amount }}</td>
+                    <td>{{ expense.get_category_display }}</td>
+                    <td>{{ expense.source }}</td>
+                    <td>
+                        <a href="{% url 'edit_expense' expense.id %}" class="btn btn-warning btn-sm" role="button">
+                            <i class="bi bi-pencil-square" title="Edit"></i> Edit
+                        </a>
+                        <a href="{% url 'delete_expense' expense.id %}" class="btn btn-danger btn-sm" role="button">
+                            <i class="bi bi-trash" title="Delete"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}

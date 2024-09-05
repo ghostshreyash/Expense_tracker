@@ -1,0 +1,58 @@
+{% extends 'tracker/base.html' %}
+
+{% block title %}Charts and Statistics - Your Expense Tracker{% endblock %}
+
+{% block content %}
+    <div class="container mt-4">
+        <h2>Charts and Statistics</h2>
+
+        <!-- Your chart.js chart goes here -->
+        <canvas id="expenseChart" width="400" height="200"></canvas>
+
+        <!-- Display statistical information -->
+        <h3>Expense by Category</h3>
+        <ul>
+            {% for category_data in expenses_by_category %}
+                <li>{{ category_data.category }}: {{ category_data.total_amount }}</li>
+            {% endfor %}
+        </ul>
+
+        <h3>Monthly Expense Statistics</h3>
+        <p>Average Monthly Expense: {{ monthly_expense_statistics.average_monthly_expense }}</p>
+    </div>
+
+    <!-- Include your chart.js script -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        var expenses_by_category = [
+            '{% for category_data in expenses_by_category %}',
+                {
+                    category: "{{ category_data.category }}",
+                    total_amount: '{{ category_data.total_amount }}'
+                },
+            '{% endfor %}'
+        ];
+
+        var ctx = document.getElementById('expenseChart').getContext('2d');
+        var myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: expenses_by_category.map(item => item.category),
+                datasets: [{
+                    label: 'Total Expense',
+                    data: expenses_by_category.map(item => item.total_amount),
+                    backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                    borderColor: 'rgba(255, 99, 132, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+{% endblock %}
